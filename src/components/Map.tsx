@@ -41,8 +41,6 @@ export const Map = () => {
     });
   };
 
-  const url =
-    "https://apis.data.go.kr/6270000/dgInParkwalk/getDgWalkItem?serviceKey=GSMGNn0FiSrwg3aS5ruMO1cV3UxJgLvQT7zC4rNGNq94RaqLCXJ1NPJ%2BUIR2%2FYhewtDB9zNv80xadf6hXL6Aew%3D%3D&type=xml&id=1";
   const getWalk = async () => {
     try {
       const response = await axios.get(
@@ -50,7 +48,7 @@ export const Map = () => {
         {
           params: {
             serviceKey: go_api_key,
-            type: "xml",
+            type: "json",
             id: "1",
           },
         }
