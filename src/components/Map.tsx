@@ -1,34 +1,28 @@
-import { GoogleMap, LoadScript } from "@react-google-maps/api";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import React, { type ReactElement, useEffect, useState } from 'react';
+import { GoogleMap, LoadScript } from '@react-google-maps/api';
 
-export const Map = () => {
+import axios from 'axios';
+import { type Position, type Coordinates } from '../data/interface';
+
+function Map(): ReactElement {
   const [myPosition, setMyPosition] = useState<Coordinates | undefined>({
     latitude: 0,
     longitude: 0,
   });
   const [loading, setLoading] = useState<boolean>(true);
 
-  const map_api_key = import.meta.env.VITE_MAP_API_KEY;
-  const go_api_key = import.meta.env.VITE_DATA_GO_API_KEY;
+  const mapApiKey = import.meta.env.VITE_MAP_API_KEY as string;
+  const goApiKey = import.meta.env.VITE_DATA_GO_API_KEY as string;
 
   const containerStyle = {
-    width: "100%",
-    height: "400px",
+    width: '100%',
+    height: '400px',
   };
 
-  interface Coordinates {
-    latitude: number;
-    longitude: number;
-  }
-  interface Position {
-    coords: Coordinates;
-  }
-
-  const getCurrentLocation = async (): Promise<Coordinates> => {
-    return new Promise<Coordinates>((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject("Geolocation is not supported by this browser.");
+  const getCurrentLocation = async (): Promise<Coordinates> =>
+    new Promise<Coordinates>((resolve, reject): void => {
+      if (navigator.geolocation == undefined) {
+        reject(new Error('Geolocation is not supported by this browser.'));
       }
       navigator.geolocation.getCurrentPosition(
         (position: Position) => {
@@ -36,20 +30,21 @@ export const Map = () => {
           resolve({ latitude, longitude });
           setLoading(false);
         },
-        (error) => reject(error)
+        (error) => {
+          reject(error);
+        }
       );
     });
-  };
 
-  const getWalk = async () => {
+  const getWalk = async (): Promise<void> => {
     try {
       const response = await axios.get(
-        "http://apis.data.go.kr/6270000/dgInParkwalk/getDgWalkItem?",
+        'http://apis.data.go.kr/6270000/dgInParkwalk/getDgWalkItem?',
         {
           params: {
-            serviceKey: go_api_key,
-            type: "json",
-            id: "1",
+            serviceKey: goApiKey,
+            type: 'json',
+            id: '1',
           },
         }
       );
@@ -59,8 +54,8 @@ export const Map = () => {
     }
   };
 
-  useEffect(() => {
-    getCurrentLocation().then((res) => {
+  useEffect((): void => {
+    getCurrentLocation().then(async (res): Promise<void> => {
       console.log(res);
       setMyPosition(res);
       getWalk();
@@ -68,20 +63,25 @@ export const Map = () => {
   }, []);
 
   return (
-    <>
+    <div>
       {!loading ? (
-        <LoadScript googleMapsApiKey={map_api_key}>
+        <LoadScript googleMapsApiKey={mapApiKey}>
           <GoogleMap
             mapContainerStyle={containerStyle}
-            center={{ lat: myPosition!.latitude, lng: myPosition!.longitude }}
+            center={{
+              lat: myPosition!.latitude,
+              lng: myPosition!.longitude,
+            }}
             zoom={10}
           >
             {/* 마커, 폴리곤 등 구현 */}
           </GoogleMap>
         </LoadScript>
       ) : (
-        "loading!!!"
+        'loading!!!'
       )}
-    </>
+    </div>
   );
-};
+}
+
+export default Map;
