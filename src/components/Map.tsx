@@ -21,7 +21,7 @@ function Map(): ReactElement {
 
   const getCurrentLocation = async (): Promise<Coordinates> =>
     new Promise<Coordinates>((resolve, reject): void => {
-      if (navigator.geolocation == undefined) {
+      if (navigator.geolocation === undefined) {
         reject(new Error('Geolocation is not supported by this browser.'));
       }
       navigator.geolocation.getCurrentPosition(
